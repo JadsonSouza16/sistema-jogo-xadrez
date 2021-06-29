@@ -7,3 +7,4 @@ public class TabuleiroException extends RuntimeException {
 		super(msg);
 	}
 }
+ 
