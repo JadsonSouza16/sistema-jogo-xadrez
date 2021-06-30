@@ -4,13 +4,13 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import xadrez.Color;
+import xadrez.PartidaXadrez;
 import xadrez.XadrezPeca;
 import xadrez.XadrezPosicao;
 
 public class UI {
 
 	// https://stackoverflow.com/questions/5762491/how-to-print-color-in-console-using-system-out-println
-
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
 	public static final String ANSI_RED = "\u001B[31m";
@@ -47,6 +47,13 @@ public class UI {
 		}
 	}
 
+	public static void printPartida(PartidaXadrez partidaXadrez) {
+		printTabuleiro(partidaXadrez.recebePecas());
+		System.out.println();
+		System.out.println("Turno " + partidaXadrez.getTurno() + ":");
+		System.out.println("Aguardando jogador " + partidaXadrez.getJogadorAtual());
+	}
+	
 	public static void printTabuleiro(XadrezPeca[][] pecas) {
 		for (int i = 0; i < pecas.length; i++) {
 			System.out.print((8 - i) + " ");
