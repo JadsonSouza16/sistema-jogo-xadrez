@@ -16,6 +16,7 @@ public class PartidaXadrez {
 	private Color jogadorAtual;
 	private Tabuleiro tabuleiro;
 	private boolean xeque;
+	private boolean xequeMate;
 	
 	private List<Peca> pecasNoTabuleiro = new ArrayList<>();
 	private List<Peca> pecasCapturadas = new ArrayList<>();
@@ -38,6 +39,10 @@ public class PartidaXadrez {
 	
 	public boolean getXeque() {
 		return xeque;
+	}
+	
+	public boolean getXequeMate() {
+		return xequeMate;
 	}
 	
 	public XadrezPeca[][] recebePecas() {
@@ -70,7 +75,13 @@ public class PartidaXadrez {
 		
 		xeque = (testeXeque(oponente(jogadorAtual))) ? true : false;
 		
-		proximoTurno();
+		if (testeXequeMate(oponente(jogadorAtual))){
+			xequeMate = true;
+		}
+		else {
+			proximoTurno();
+		}
+		
 		return (XadrezPeca)capturarPeca;
 	}
 	
@@ -147,24 +158,43 @@ public class PartidaXadrez {
 		return false;
 	}
 	
+	private boolean testeXequeMate(Color color) {
+		if (!testeXeque(color)) {
+			return false;
+		}
+		List<Peca> list = pecasNoTabuleiro.stream().filter(x -> ((XadrezPeca)x).getColor() == color).collect(Collectors.toList());
+		for (Peca p : list) {
+			boolean[][] mat = p.movimentosPossivel();
+			for (int i=0; i<tabuleiro.getLinhas(); i++) {
+				for (int j=0; j<tabuleiro.getColunas(); j++) {
+					if (mat[i][j]) {
+						Posicao origem = ((XadrezPeca)p).getXadrezPosicao().toPosicao();
+						Posicao finall = new Posicao(i, j);
+						Peca capturarPeca = fazerMovimento(origem, finall);
+						boolean testeXeque = testeXeque(color);
+						desfazerMovimento(origem, finall, capturarPeca);
+						if(!testeXeque) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+		
+	}
+	
 	private void novoLugarPeca(char coluna, int linha, XadrezPeca peca) {
 		tabuleiro.lugarPeca(peca, new XadrezPosicao(coluna, linha).toPosicao());
 		pecasNoTabuleiro.add(peca);
 	}
 
 	private void iniciaPartida() {
-		novoLugarPeca('c', 1, new Torre(tabuleiro, Color.WHITE));
-		novoLugarPeca('c', 2, new Torre(tabuleiro, Color.WHITE));
-		novoLugarPeca('d', 2, new Torre(tabuleiro, Color.WHITE));
-		novoLugarPeca('e', 2, new Torre(tabuleiro, Color.WHITE));
-		novoLugarPeca('e', 1, new Torre(tabuleiro, Color.WHITE));
-		novoLugarPeca('d', 1, new Rei(tabuleiro, Color.WHITE));
-
-		novoLugarPeca('c', 7, new Torre(tabuleiro, Color.BLACK));
-		novoLugarPeca('c', 8, new Torre(tabuleiro, Color.BLACK));
-		novoLugarPeca('d', 7, new Torre(tabuleiro, Color.BLACK));
-		novoLugarPeca('e', 7, new Torre(tabuleiro, Color.BLACK));
-		novoLugarPeca('e', 8, new Torre(tabuleiro, Color.BLACK));
-		novoLugarPeca('d', 8, new Rei(tabuleiro, Color.BLACK));
+		novoLugarPeca('h', 7, new Torre(tabuleiro, Color.WHITE));
+		novoLugarPeca('d', 1, new Torre(tabuleiro, Color.WHITE));
+		novoLugarPeca('e', 1, new Rei(tabuleiro, Color.WHITE));
+		
+		novoLugarPeca('b', 8, new Torre(tabuleiro, Color.BLACK));
+		novoLugarPeca('a', 8, new Rei(tabuleiro, Color.BLACK));
 	}
 }
